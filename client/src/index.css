@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.bg-glass {
+  background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+  backdrop-filter: blur(10px); /* Add blur effect to elements behind */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Optional: Add border for better visibility */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); /* Optional: Add shadow for a frosted effect */
+}
+
+body{
+  width: 100vw;
+}
