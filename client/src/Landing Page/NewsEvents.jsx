@@ -125,8 +125,6 @@
 
 
 
-
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Modal from 'react-modal';
@@ -139,19 +137,28 @@ function NewsEvents() {
     const [nextPageToken, setNextPageToken] = useState(null);
     const [loading, setLoading] = useState(true);
     const [fetchedVideoIds, setFetchedVideoIds] = useState(new Set());
+    const [currentPage, setCurrentPage] = useState(1);
 
     const API_KEY = 'AIzaSyCrqlexWqralIfU0X3jSuS_xTqdBABtV7A'; // Replace with your API key
     const CHANNEL_ID = 'UCBPLMRPHyxsxdn55S9V1buw'; // Replace with the obtained channel ID
-    
+
     useEffect(() => {
         fetchVideos();
     }, []);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            handleNextPage();
+        }, 15000); // 10 seconds interval
+
+        return () => clearInterval(interval); // Clean up the interval on component unmount
+    }, [currentPage, videos]);
 
     const fetchVideos = async (pageToken = '') => {
         try {
             setLoading(true);
             const response = await axios.get(
-                `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=10&pageToken=${pageToken}`
+                `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet,id&order=date&maxResults=50&pageToken=${pageToken}`
             );
 
             const newVideos = response.data.items.filter(video => {
@@ -185,6 +192,18 @@ function NewsEvents() {
         video.snippet.title.toLowerCase().includes(filter.toLowerCase())
     );
 
+    const videosPerPage = 12;
+    const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+    const displayedVideos = filteredVideos.slice((currentPage - 1) * videosPerPage, currentPage * videosPerPage);
+
+    const handleNextPage = () => {
+        setCurrentPage(prevPage => (prevPage < totalPages ? prevPage + 1 : 1));
+    };
+
+    const handlePrevPage = () => {
+        setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : totalPages));
+    };
+
     return (
         <div className="relative font-inter antialiased">
             <main className="relative min-h-screen flex flex-col justify-center bg-slate-50 overflow-hidden">
@@ -199,8 +218,8 @@ function NewsEvents() {
                         />
                     </div>
 
-                    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredVideos.map((video, index) => (
+                    <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {displayedVideos.map((video, index) => (
                             <div key={index} className="w-full p-2 flex items-center justify-center">
                                 <div className="w-full cursor-pointer" onClick={() => openModal(video.id.videoId)}>
                                     <iframe
@@ -215,6 +234,37 @@ function NewsEvents() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    <div className="flex justify-between mt-4">
+                        <button
+                            onClick={handlePrevPage}
+                            className="absolute left-14 top-1/2 -translate-y-1/2 w-11 h-11 flex justify-center items-center rounded-full shadow-md z-10 bg-gray-100 hover:bg-gray-200"
+                        >
+                            <svg
+                                className="w-8 h-8 font-bold transition duration-500 ease-in-out transform motion-reduce:transform-none text-gray-500 hover:text-gray-600 hover:-translate-x-0.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                        </button>
+                        <button
+                            onClick={handleNextPage}
+                            className="absolute right-14 top-1/2 -translate-y-1/2 w-11 h-11 flex justify-center items-center rounded-full shadow-md z-10 bg-gray-100 hover:bg-gray-200"
+                        >
+                            <svg
+                                className="w-8 h-8 font-bold transition duration-500 ease-in-out transform motion-reduce:transform-none text-gray-500 hover:text-gray-600 hover:translate-x-0.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
                     </div>
 
                     {nextPageToken && !loading && (

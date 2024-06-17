@@ -13,7 +13,7 @@ function Navbar() {
         <header className="sticky w-full top-0 z-50 bg-white shadow-md ">
             <div className="bg-gray-800 text-white py-2">
                 <div className="container mx-auto flex justify-between items-center">
-                    <div className="flex space-x-4">
+                    <div className="flex space-x-10">
                         <span><i className="fas fa-envelope-square"></i> atheist-society-kenya@gmail.com</span>
                         <span><i className="fas fa-phone-square"></i> +254 7XX XXX XXX</span>
                     </div>
@@ -22,7 +22,7 @@ function Navbar() {
             <div className="bg-blue-300">
                 <div className="container mx-auto flex justify-between items-center py-2">
                     <div className="flex items-center">
-                        <img src={Logo} alt="Logo" className="h-20" />
+                        <img src={Logo} alt="Logo" className="h-10" />
                         <button
                             className="text-gray-700 md:hidden ml-4"
                             aria-label="Toggle menu"

@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const imageUrls = [
-//   "https://upload.wikimedia.org/wikipedia/commons/0/03/Kashi_Vishwanath_Temple_Banaras.jpg",
   "https://pbs.twimg.com/media/FGRnUzPVEAAbqM8?format=jpg&name=large",
   "https://pbs.twimg.com/media/FGRnNpAVUAYqRYv?format=jpg&name=large",
   "https://pbs.twimg.com/media/FGRnP_TUUAAttG3?format=jpg&name=large",
@@ -16,10 +15,32 @@ const imageUrls = [
 ];
 
 export default function Gallery() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 12;
+  const totalPages = Math.ceil(imageUrls.length / imagesPerPage);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleNextPage();
+    }, 15000); // 15 seconds interval
+
+    return () => clearInterval(interval); // Clean up the interval on component unmount
+  }, [currentPage]);
+
+  const handleNextPage = () => {
+    setCurrentPage(prevPage => (prevPage < totalPages ? prevPage + 1 : 1));
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(prevPage => (prevPage > 1 ? prevPage - 1 : totalPages));
+  };
+
+  const displayedImages = imageUrls.slice((currentPage - 1) * imagesPerPage, currentPage * imagesPerPage);
+
   return (
-    <div className="mx-auto p-4 mt-2">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-        {imageUrls.map((imageUrl, index) => (
+    <div className="relative mx-auto p-4 mt-2">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+        {displayedImages.map((imageUrl, index) => (
           <div key={index} className="image-container">
             <img
               className="rounded-lg w-full h-full object-cover"
@@ -29,7 +50,37 @@ export default function Gallery() {
           </div>
         ))}
       </div>
+
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={handlePrevPage}
+          className="absolute left-14 top-1/2 -translate-y-1/2 w-11 h-11 flex justify-center items-center rounded-full shadow-md z-10 bg-gray-100 hover:bg-gray-200"
+        >
+          <svg
+            className="w-8 h-8 font-bold transition duration-500 ease-in-out transform motion-reduce:transform-none text-gray-500 hover:text-gray-600 hover:-translate-x-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button
+          onClick={handleNextPage}
+          className="absolute right-14 top-1/2 -translate-y-1/2 w-11 h-11 flex justify-center items-center rounded-full shadow-md z-10 bg-gray-100 hover:bg-gray-200"
+        >
+          <svg
+            className="w-8 h-8 font-bold transition duration-500 ease-in-out transform motion-reduce:transform-none text-gray-500 hover:text-gray-600 hover:translate-x-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
-
